@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    container_name: nimbusdocsp1
+    ports:
+      - "2001:80"
+    restart: unless-stopped
