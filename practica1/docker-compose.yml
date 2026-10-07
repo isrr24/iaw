@@ -2,16 +2,17 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    image: httpd:2.4-alpine
     container_name: nimbusdocsp1
     ports:
       - "2001:80"
     restart: unless-stopped
     volumes:
       - ./www:/usr/local/apache2/htdocs
-      - ./apache/conf/vhosts.conf:/usr/local/apache2/conf/extra/httpd.vhosts.conf
+      - ./apache/conf/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
+      - ./apache/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
 # Aquí añades los dominios para el /etc/hosts del contenedor
     extra_hosts:
       - "default.local:127.0.0.1"
       - "nimbus1.local:127.0.0.1"
-      - "nimbus2.local:127.0.0.1"
+    #  - "nimbus2.local:127.0.0.1"
