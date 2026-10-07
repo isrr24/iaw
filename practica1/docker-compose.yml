@@ -12,5 +12,6 @@ services:
       - ./apache/conf/vhosts.conf:/usr/local/apache2/conf/extra/httpd.vhosts.conf
 # Aquí añades los dominios para el /etc/hosts del contenedor
     extra_hosts:
+      - "default.local:127.0.0.1"
       - "nimbus1.local:127.0.0.1"
       - "nimbus2.local:127.0.0.1"
