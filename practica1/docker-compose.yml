@@ -7,3 +7,10 @@ services:
     ports:
       - "2001:80"
     restart: unless-stopped
+    volumes:
+      - ./www:/usr/local/apache2/htdocs
+      - ./apache/conf/vhosts.conf:/usr/local/apache2/conf/extra/httpd.vhosts.conf
+# Aquí añades los dominios para el /etc/hosts del contenedor
+    extra_hosts:
+      - "nimbus1.local:127.0.0.1"
+      - "nimbus2.local:127.0.0.1"
