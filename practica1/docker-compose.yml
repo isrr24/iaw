@@ -2,17 +2,13 @@ version: '3.8'
 
 services:
   web:
-    image: httpd:2.4-alpine
+    image: php:8.2-apache
     container_name: nimbusdocsp1
     ports:
       - "2001:80"
     restart: unless-stopped
     volumes:
-      - ./www:/usr/local/apache2/htdocs
-      - ./apache/conf/httpd-vhosts.conf:/usr/local/apache2/conf/extra/httpd-vhosts.conf
-      - ./apache/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
-# Aquí añades los dominios para el /etc/hosts del contenedor
-    extra_hosts:
-      - "default.local:127.0.0.1"
-      - "nimbus1.local:127.0.0.1"
-    #  - "nimbus2.local:127.0.0.1"
+      # Mapeo de las carpetas de tus webs a la ruta por defecto de Debian/Ubuntu
+      - ./www:/var/www
+      # Mapeo de la carpeta donde pondrás los VirtualHosts (.conf)
+      - ./apache/sites-available:/etc/apache2/sites-available
