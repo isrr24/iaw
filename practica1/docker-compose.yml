@@ -12,3 +12,5 @@ services:
       - ./www:/var/www
       # Mapeo de la carpeta donde pondrás los VirtualHosts (.conf)
       - ./apache/sites-available:/etc/apache2/sites-available
+      # Añade esta línea para mapear los logs:
+      - ./apache/logs:/var/log/apache2
