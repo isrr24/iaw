@@ -14,3 +14,15 @@ services:
       - ./apache/sites-available:/etc/apache2/sites-available
       # Añade esta línea para mapear los logs:
       - ./apache/logs:/var/log/apache2
+
+  proxy:
+    image: nginx:latest
+    container_name: nimbusdocs-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certificados:/etc/nginx/certificados:ro
+    depends_on:
+      - web
