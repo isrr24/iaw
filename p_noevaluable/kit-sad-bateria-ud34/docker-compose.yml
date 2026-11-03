@@ -1,0 +1,67 @@
+# Batería guiada SAD · UD3 + UD4. Es el laboratorio de clase (mismas máquinas y redes): usa este O el de clase, no los dos a la vez. Se maneja con ./lab.sh (./lab.sh ayuda).
+#
+#   «Internet» 203.0.113.0/24      DMZ 10.10.20.0/24      LAN 10.10.10.0/24
+#   internet .50 · remoto .60       web .10                 pc .5
+#                 \___________ firewall .254 (wan · dmz · lan) + VPN wg0 10.200.200.1 ___________/
+#
+# Lo que editas está en tu carpeta: firewall/nftables.conf, firewall/wireguard/ y remoto/wireguard/.
+name: sad-ud34
+
+x-maquina: &maquina
+  build: .
+  image: sad-ud34
+  cap_add: [NET_ADMIN, NET_RAW]
+  tty: true
+  stdin_open: true
+
+services:
+  firewall:
+    <<: *maquina
+    container_name: sad-ud34-firewall
+    hostname: firewall
+    environment: { ROL: firewall }
+    sysctls:
+      net.ipv4.ip_forward: 1
+    volumes:
+      - ./firewall:/lab        # carpeta entera (no ficheros sueltos: los editores los sustituyen y Docker no lo ve)
+    networks:
+      internet: { ipv4_address: 203.0.113.254 }
+      dmz: { ipv4_address: 10.10.20.254 }
+      lan: { ipv4_address: 10.10.10.254 }
+
+  pc:
+    <<: *maquina
+    container_name: sad-ud34-pc
+    hostname: pc
+    environment: { ROL: pc }
+    networks: { lan: { ipv4_address: 10.10.10.5 } }
+    depends_on: [firewall]
+
+  web:
+    <<: *maquina
+    container_name: sad-ud34-web
+    hostname: web
+    environment: { ROL: web }
+    networks: { dmz: { ipv4_address: 10.10.20.10 } }
+    depends_on: [firewall]
+
+  internet:
+    <<: *maquina
+    container_name: sad-ud34-internet
+    hostname: internet
+    environment: { ROL: internet }
+    networks: { internet: { ipv4_address: 203.0.113.50 } }
+
+  remoto:
+    <<: *maquina
+    container_name: sad-ud34-remoto
+    hostname: remoto
+    environment: { ROL: remoto }
+    volumes:
+      - ./remoto:/lab
+    networks: { internet: { ipv4_address: 203.0.113.60 } }
+
+networks:
+  internet: { ipam: { config: [{ subnet: 203.0.113.0/24, gateway: 203.0.113.1 }] } }
+  dmz: { internal: true, ipam: { config: [{ subnet: 10.10.20.0/24, gateway: 10.10.20.1 }] } }
+  lan: { internal: true, ipam: { config: [{ subnet: 10.10.10.0/24, gateway: 10.10.10.1 }] } }
