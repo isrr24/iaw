@@ -7,5 +7,5 @@ declare(strict_types=1);
 //         Ahora lo devuelve tal cual: así, el que escriba <script> en un saludo lo ejecuta en el navegador de todos.
 function e(string $texto): string
 {
-    return $texto;
+    return htmlspecialchars($texto, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 }
