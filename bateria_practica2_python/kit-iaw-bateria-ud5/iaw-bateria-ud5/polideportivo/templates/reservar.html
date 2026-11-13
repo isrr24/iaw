@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h2>Reservar una pista</h2>
+{% for e in errores %}<p class="error">{{ e }}</p>{% endfor %}
+{% if hecha %}
+  {# ✍️ 3.1 Lo que escribe el usuario no se imprime sin escapar. #}
+  <p class="nota" id="reserva">Reserva hecha, {{ hecha.nombre|safe }}: {{ hecha.pista.nombre }} a las {{ hecha.hora }}:00.</p>
+{% endif %}
+<form method="post" action="/reservar">
+  <label>Nombre <input name="nombre"></label>
+  <label>Pista <select name="pista">{% for p in pistas %}<option value="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}</select></label>
+  <label>Hora (9 a 21) <input name="hora" type="number" min="9" max="21"></label>
+  <label>Comentario <input name="comentario"></label>
+  <button>Reservar</button>
+</form>
+{% endblock %}

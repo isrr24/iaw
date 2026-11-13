@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h2 id="pista">{{ pista.nombre }}</h2>
+<p>Deporte: {{ pista.deporte }} · {{ "Disponible" if pista.disponible else "En obras" }}</p>
+<p><a href="/reservar">Reservar una pista</a></p>
+{% endblock %}

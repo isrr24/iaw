@@ -1,0 +1,51 @@
+name: iaw-bateria-ud5
+
+# Batería UD5 · las reservas del polideportivo con Nginx + Gunicorn (Flask)
+#   cliente ──HTTPS──▶ nginx (TLS + estáticos) ──HTTP app:8000 (proxy_pass)──▶ app (Gunicorn + Flask)
+# Puertos del host: 8088 (HTTP) y 8448 (HTTPS). No chocan con los laboratorios (UD5 8084/8446) ni con la batería UD4 (8087/8447).
+# No hace falta usar docker compose a mano: ./bateria.sh lo hace por ti.
+
+services:
+  nginx:
+    build: { context: ., dockerfile: Dockerfile.nginx }
+    image: iaw-ud5-nginx
+    container_name: iawb5-nginx
+    command: ["/lab/arranque-nginx.sh"]
+    ports: ["8088:80", "8448:443"]
+    volumes:
+      - ./arranque-nginx.sh:/lab/arranque-nginx.sh:ro
+      - ./nginx/sites-available:/etc/nginx/sites-available
+      - ./polideportivo/static:/var/www/polideportivo/static:ro   # los estáticos los sirve Nginx, sin pasar por Python
+      - ./certs:/etc/ssl/lab:ro
+      - ./logs:/var/log/nginx
+    networks:
+      lab:
+        aliases: [polideportivo.iaw.local]
+      interna: {}
+    depends_on: [app]
+
+  app:
+    build: { context: ., dockerfile: Dockerfile.app }
+    image: iaw-ud5-app
+    container_name: iawb5-app
+    command: ["/lab/arranque-app.sh"]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"        # que Python no deje carpetas __pycache__ (de root) en tus ficheros
+    volumes:
+      - ./arranque-app.sh:/lab/arranque-app.sh:ro
+      - ./config:/lab/config              # gunicorn.conf.py y polideportivo.env
+      - ./polideportivo:/srv/polideportivo
+      - ./logs:/var/log/lab
+    networks: [interna]                   # la app no se ve desde fuera: solo Nginx llega a ella
+
+  cliente:
+    image: alpine:3.20
+    container_name: iawb5-cliente
+    command: sh -c "apk add --no-cache curl >/dev/null && sleep infinity"
+    networks: [lab]
+    depends_on: [nginx]
+
+networks:
+  lab: {}
+  interna:
+    internal: true

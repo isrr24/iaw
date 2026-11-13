@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{# 👀 La portada: un bucle por las pistas. {{ }} escapa solo lo que imprime. #}
+{% block contenido %}
+<h2>Pistas ({{ pistas|length }})</h2>
+<table id="pistas">
+  <tr><th>Pista</th><th>Deporte</th><th>Estado</th></tr>
+  {% for p in pistas %}
+  <tr><td><a href="/pista/{{ p.id }}">{{ p.nombre }}</a></td><td>{{ p.deporte }}</td>
+      <td>{{ "Disponible" if p.disponible else "En obras" }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

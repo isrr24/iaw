@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block contenido %}
+<p class="nota" id="hola">Hola, {{ usuario }}. <a href="/salir">Salir</a></p>
+<h2>Reservas ({{ reservas|length }})</h2>
+<table id="reservas">
+  <tr><th>Pista</th><th>Hora</th><th>Nombre</th><th>Comentario</th></tr>
+  {% for r in reservas %}
+  {# ✍️ 3.2 Aquí también hay algo que escribió el usuario y no se escapa. #}
+  <tr><td>{{ r.pista }}</td><td>{{ r.hora }}:00</td><td>{{ r.nombre }}</td><td>{{ r.comentario|safe }}</td></tr>
+  {% endfor %}
+</table>
+{% endblock %}

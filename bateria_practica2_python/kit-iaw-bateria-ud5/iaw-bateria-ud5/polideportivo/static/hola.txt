@@ -1,0 +1,1 @@
+Soy un fichero estático: lo sirve Nginx directamente, sin pasar por Python.

@@ -1,0 +1,11 @@
+# 🔮 Predicciones. Escribe tu respuesta DESPUÉS del «=», ANTES de probarlo.
+# Bloque 1 · ¿qué código ve el cliente? Responde: 200, 404, 405, 500 o 502.
+1.a = 404
+1.b = 502
+1.c = 405
+1.d = 502
+# Bloque 4 · Responde: sí o no.
+4.a =
+4.b =
+4.c =
+4.d =

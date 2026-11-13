@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>{{ titulo or "Polideportivo municipal" }}</title>
+  <link rel="stylesheet" href="/estilo.css">
+</head>
+<body>
+<header><h1>🏸 Polideportivo municipal</h1>
+  <nav><a href="/">Pistas</a> · <a href="/reservar">Reservar</a> · <a href="/admin">Conserjería</a> · <a href="/api/pistas">API</a></nav>
+</header>
+{% block contenido %}{% endblock %}
+</body>
+</html>
