@@ -4,7 +4,7 @@
 {% for e in errores %}<p class="error">{{ e }}</p>{% endfor %}
 {% if hecha %}
   {# ✍️ 3.1 Lo que escribe el usuario no se imprime sin escapar. #}
-  <p class="nota" id="reserva">Reserva hecha, {{ hecha.nombre|safe }}: {{ hecha.pista.nombre }} a las {{ hecha.hora }}:00.</p>
+  <p class="nota" id="reserva">Reserva hecha, {{ hecha.nombre }}: {{ hecha.pista.nombre }} a las {{ hecha.hora }}:00.</p>
 {% endif %}
 <form method="post" action="/reservar">
   <label>Nombre <input name="nombre"></label>
