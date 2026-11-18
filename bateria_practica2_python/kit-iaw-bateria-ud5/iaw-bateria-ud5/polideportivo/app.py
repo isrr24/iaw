@@ -156,13 +156,19 @@ def admin():
 def api_pistas():
     # ✍️ 6.1 Las pistas en JSON: la lista PISTAS entera.
     # ✍️ 6.2 Con ?libres=1, solo las que están disponibles.
-    return "Sin hacer"
+    pistas = PISTAS
+    if request.args.get("libres") == "1":
+        pistas = [p for p in PISTAS if p["disponible"]]
+    return jsonify(pistas)
 
 
 @app.route("/api/pistas/<int:id>")
 def api_pista(id):
     # ✍️ 6.3 Una pista en JSON. Si no existe: {"error": "No existe esa pista"} con el código 404 (también en JSON).
-    return "Sin hacer"
+    p = buscar_pista(id)
+    if p is None:
+        return jsonify({"error": "No existe esa pista"}), 404
+    return jsonify(p)
 
 
 @app.route("/error")
