@@ -145,6 +145,8 @@ def admin():
     filas = [dict(r, pista=buscar_pista(r["pista"])["nombre"]) for r in RESERVAS]
     return render_template("admin.html", usuario=session.get("usuario", "¿?"), reservas=filas)
 
+if "usuario" not in session:
+    return redirect(url_for( "entrar" ))
 
 @app.route("/api/pistas")
 def api_pistas():
