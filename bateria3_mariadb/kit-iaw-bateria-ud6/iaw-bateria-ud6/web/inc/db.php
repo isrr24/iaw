@@ -24,8 +24,9 @@ function leer_env(string $fichero): array
 //        - el usuario y la contraseña, de $cfg. Al final, ni 'root' ni ninguna contraseña escrita en este fichero.
 function conectar(): PDO
 {
-    $dsn = 'mysql:host=db;dbname=inventario;charset=utf8mb4';
-    return new PDO($dsn, 'root', 'raiz-de-la-bateria', [
+    $cfg = leer_env('/etc/inventario/inventario.env');
+    $dsn = "mysql:host={$cfg['DB_HOST']};dbname={$cfg['DB_NAME']};charset=utf8mb4";
+    return new PDO($dsn, $cfg['DB_USER'], $cfg['DB_PASS'], [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,   // si algo falla, que avise (excepción)
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,         // cada fila, un array con los nombres de columna
     ]);
