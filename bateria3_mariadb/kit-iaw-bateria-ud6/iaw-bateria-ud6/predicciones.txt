@@ -1,0 +1,11 @@
+# 🔮 Predicciones. Escribe tu respuesta DESPUÉS del «=», ANTES de probarlo.
+# Bloque 1 · ¿qué número de error da MariaDB? Responde: 1044, 1045, 1142 o 2002.
+1.a =
+1.b =
+1.c =
+1.d =
+# Bloque 3 y bloque 4 · Responde: sí o no.
+3.a =
+3.b =
+4.a =
+4.b =

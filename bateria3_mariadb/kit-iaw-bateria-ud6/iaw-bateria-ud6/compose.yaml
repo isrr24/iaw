@@ -1,0 +1,101 @@
+name: iaw-bateria-ud6
+
+# Batería UD6 · El inventario del aula: la web (PHP) y la API (Python) con sus datos en MariaDB, y la configuración en Git
+#   cliente ──HTTPS──▶ nginx ──FastCGI──▶ php (PHP-FPM + PDO) ─────────┐
+#                          └──HTTP /api/──▶ app (Gunicorn + PyMySQL) ──┼──▶ db (MariaDB 11.4, :3306)
+#                                          admin (mariadb, mysqldump, git) ┘    red «interna» (sin salida)
+# Puertos del host: 8089 (HTTP) y 8450 (HTTPS). No chocan con el laboratorio de clase (8085/8449) ni con otras baterías.
+# No hace falta usar docker compose a mano: ./bateria.sh lo hace por ti.
+
+services:
+  nginx:
+    build: { context: ., dockerfile: Dockerfile.nginx }
+    image: iaw-ud5-nginx
+    container_name: iawb6-nginx
+    command: ["/lab/arranque-nginx.sh"]
+    ports: ["8089:80", "8450:443"]
+    volumes:
+      - ./arranque-nginx.sh:/lab/arranque-nginx.sh:ro
+      - ./servidor/nginx:/etc/nginx/sites-available     # la configuración vive en servidor/ (en Git, bloque 5)
+      - ./web:/var/www/inventario
+      - ./certs:/etc/ssl/lab:ro
+      - ./logs:/var/log/nginx
+    networks:
+      lab:
+        aliases: [inventario.iaw.local]
+      interna: {}
+    depends_on: [php, app]
+
+  php:
+    build: { context: ., dockerfile: Dockerfile.php }
+    image: iaw-ud6-php
+    container_name: iawb6-php
+    volumes:
+      - ./web:/var/www/inventario
+      - ./servidor:/etc/inventario:ro       # inventario.env: fuera de la web
+    networks: [interna]
+    depends_on:
+      db: { condition: service_healthy }
+
+  app:
+    build: { context: ., dockerfile: Dockerfile.app }
+    image: iaw-ud6-app
+    container_name: iawb6-app
+    command: ["/lab/arranque-app.sh"]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"          # que Python no deje carpetas __pycache__ (de root) en tus ficheros
+    volumes:
+      - ./arranque-app.sh:/lab/arranque-app.sh:ro
+      - ./app:/srv/app
+      - ./servidor:/etc/inventario:ro
+      - ./logs:/var/log/lab
+    networks: [interna]
+    depends_on:
+      db: { condition: service_healthy }
+
+  db:
+    image: mariadb:11.4
+    container_name: iawb6-db
+    environment:
+      MARIADB_ROOT_PASSWORD: raiz-de-la-bateria   # solo para la batería: en un servidor, nunca en un fichero así
+      MARIADB_DATABASE: inventario
+    volumes:
+      - ./sql/01-inventario.sql:/docker-entrypoint-initdb.d/01-inventario.sql:ro   # la primera vez: equipos y profesorado
+      - datos:/var/lib/mysql                      # los datos, en un volumen: sobreviven a ./bateria.sh parar
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      retries: 20
+    networks: [interna]                           # la base de datos NO se ve desde fuera
+
+  admin:
+    build: { context: ., dockerfile: Dockerfile.admin }
+    image: iaw-ud6-admin
+    container_name: iawb6-admin
+    command: ["sleep", "infinity"]
+    user: "1000:1000"                             # tus ficheros siguen siendo tuyos (Git, copias)
+    environment:
+      HOME: /tmp
+      GIT_CONFIG_GLOBAL: /tmp/.gitconfig
+    working_dir: /srv/servidor
+    volumes:
+      - ./servidor:/srv/servidor
+      - ./copias:/copias
+    networks: [interna]
+    depends_on:
+      db: { condition: service_healthy }
+
+  cliente:
+    image: alpine:3.20
+    container_name: iawb6-cliente
+    command: sh -c "apk add --no-cache curl >/dev/null && sleep infinity"
+    networks: [lab]
+    depends_on: [nginx]
+
+volumes:
+  datos: {}
+
+networks:
+  lab: {}
+  interna:
+    internal: true

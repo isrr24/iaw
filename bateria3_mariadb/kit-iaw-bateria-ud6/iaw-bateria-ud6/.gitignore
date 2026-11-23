@@ -1,0 +1,5 @@
+logs/*
+!logs/.gitkeep
+copias/*
+!copias/.gitkeep
+__pycache__/
